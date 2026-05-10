@@ -8,8 +8,8 @@ namespace DungeonSlime;
 
 public class Game1 : Core
 {
-    private Sprite _slime;
-    private Sprite _bat;
+    private AnimatedSprite _slime;
+    private AnimatedSprite _bat;
     public Game1()
         : base("Dungeon Slime", 1280, 720, false)
     {
@@ -25,8 +25,8 @@ public class Game1 : Core
     protected override void LoadContent()
     {
         TextureAtlas atlas = TextureAtlas.FromFile(Content, "images/atlas-definition.xml");
-        _slime = atlas.CreateSprite("slime");
-        _bat = atlas.CreateSprite("bat");
+        _slime = atlas.CreateAnimatedSprite("slime-animation");
+        _bat = atlas.CreateAnimatedSprite("bat-animation");
         _slime.Scale = new Vector2(4f);
         _bat.Scale = new Vector2(4f);
         // TODO: use this.Content to load your game content here
@@ -35,6 +35,8 @@ public class Game1 : Core
 
     protected override void Update(GameTime gameTime)
     {
+        _slime.Update(gameTime);
+        _bat.Update(gameTime);
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
