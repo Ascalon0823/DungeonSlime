@@ -40,9 +40,39 @@ public class Game1 : Core
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
+        Rectangle iconSourceRect = new Rectangle(0, 0, 128, 128);
 
-        SpriteBatch.Begin();
-        SpriteBatch.Draw(_logo, Vector2.Zero, Color.White);
+        Rectangle wordmarkSourceRect = new Rectangle(150, 34, 458, 58);
+
+        SpriteBatch.Begin(SpriteSortMode.FrontToBack);
+        SpriteBatch.Draw(
+            _logo,
+            new Vector2(
+                Window.ClientBounds.Width * 0.5f,
+                Window.ClientBounds.Height * 0.5f
+            ),
+            iconSourceRect,
+            Color.White,
+            0f,
+            new Vector2(iconSourceRect.Width, iconSourceRect.Height) * 0.5f,
+            1.5f,
+            SpriteEffects.None,
+            1f
+            );
+        SpriteBatch.Draw(
+            _logo,
+            new Vector2(
+                Window.ClientBounds.Width * 0.5f,
+                Window.ClientBounds.Height * 0.5f
+            ),
+            wordmarkSourceRect,
+            Color.White,
+            0f,
+            new Vector2(wordmarkSourceRect.Width, wordmarkSourceRect.Height) * 0.5f,
+            1.5f,
+            SpriteEffects.None,
+            0f
+        );
         SpriteBatch.End();
         // TODO: Add your drawing code here
 
