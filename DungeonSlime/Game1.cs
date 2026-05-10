@@ -8,8 +8,8 @@ namespace DungeonSlime;
 
 public class Game1 : Core
 {
-    private TextureRegion _slime;
-    private TextureRegion _bat;
+    private Sprite _slime;
+    private Sprite _bat;
     public Game1()
         : base("Dungeon Slime", 1280, 720, false)
     {
@@ -25,8 +25,10 @@ public class Game1 : Core
     protected override void LoadContent()
     {
         TextureAtlas atlas = TextureAtlas.FromFile(Content, "images/atlas-definition.xml");
-        _slime = atlas.GetRegion("slime");
-        _bat = atlas.GetRegion("bat");
+        _slime = atlas.CreateSprite("slime");
+        _bat = atlas.CreateSprite("bat");
+        _slime.Scale = new Vector2(4f);
+        _bat.Scale = new Vector2(4f);
         // TODO: use this.Content to load your game content here
         base.LoadContent();
     }
@@ -45,8 +47,8 @@ public class Game1 : Core
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
         SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
-        _slime.Draw(SpriteBatch, Vector2.Zero, Color.White, 0f, Vector2.One, 4f, SpriteEffects.None, 0f);
-        _bat.Draw(SpriteBatch, new Vector2(_slime.Width * 4f + 10, 0), Color.White, 0f, Vector2.One, 4f, SpriteEffects.None, 0f);
+        _slime.Draw(SpriteBatch, Vector2.Zero);
+        _bat.Draw(SpriteBatch, new Vector2(_slime.Width + 10, 0));
 
         SpriteBatch.End();
         // TODO: Add your drawing code here

@@ -106,4 +106,9 @@ public class TextureAtlas
             }
         }
     }
+
+    public Sprite CreateSprite(string regionName)
+    {
+        return new Sprite(GetRegion(regionName));
+    }
 }

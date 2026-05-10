@@ -1,0 +1,47 @@
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
+namespace MonoGameLibrary.Graphics;
+
+public class Sprite
+{
+    public TextureRegion Region { get; set; }
+    public Color Color { get; set; } = Color.White;
+    public float Rotation { get; set; } = 0f;
+    public Vector2 Origin { get; set; } = Vector2.Zero;
+    public Vector2 Scale { get; set; } = Vector2.One;
+    public SpriteEffects Effects { get; set; } = SpriteEffects.None;
+    public float LayerDepth { get; set; } = 0f;
+
+    public float Width => Region.Width * Scale.X;
+    public float Height => Region.Height * Scale.Y;
+
+    public Sprite() { }
+
+    public Sprite(TextureRegion textureRegion)
+    {
+        Region = textureRegion;
+    }
+
+    public void CenterOrigin()
+    {
+        Origin = new Vector2(Region.Width, Region.Height) * 0.5f;
+    }
+    /// <summary>
+    /// Submit this sprite for drawing in the current batch.
+    /// </summary>
+    /// <param name="spriteBatch">The spritebatch instance used for batching draw calls.</param>
+    public void Draw(SpriteBatch spriteBatch, Vector2 position)
+    {
+        Region.Draw(
+            spriteBatch,
+            position,
+            Color,
+            Rotation,
+            Origin,
+            Scale,
+            Effects,
+            LayerDepth
+        );
+    }
+}
