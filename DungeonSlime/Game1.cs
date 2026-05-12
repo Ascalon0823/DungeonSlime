@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGameLibrary;
 using MonoGameLibrary.Graphics;
+using MonoGameLibrary.Input;
 
 namespace DungeonSlime;
 
@@ -44,11 +46,10 @@ public class Game1 : Core
 
     protected override void Update(GameTime gameTime)
     {
+        base.Update(gameTime);
+
         _slime.Update(gameTime);
         _bat.Update(gameTime);
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
-
         // TODO: Add your update logic here
         CheckKeyboardInput();
         CheckGamePadInput();
@@ -58,14 +59,12 @@ public class Game1 : Core
             Vector2 direction = _inputBuffer.Dequeue();
             _slimePosition += direction * _speed;
         }
-        base.Update(gameTime);
     }
 
     private void CheckKeyboardInput()
     {
-        KeyboardState keyboardState = Keyboard.GetState();
         Vector2 newDirection = Vector2.Zero;
-        if (keyboardState.IsKeyDown(Keys.Space))
+        if (Input.Keyboard.IsKeyDown(Keys.Space))
         {
             _speed = 1.5f * MOVE_SPEED;
         }
@@ -73,19 +72,19 @@ public class Game1 : Core
         {
             _speed = MOVE_SPEED;
         }
-        if (keyboardState.IsKeyDown(Keys.W) || keyboardState.IsKeyDown(Keys.Up))
+        if (Input.Keyboard.IsKeyDown(Keys.W) || Input.Keyboard.IsKeyDown(Keys.Up))
         {
             newDirection = -Vector2.UnitY;
         }
-        else if (keyboardState.IsKeyDown(Keys.S) || keyboardState.IsKeyDown(Keys.Down))
+        else if (Input.Keyboard.IsKeyDown(Keys.S) || Input.Keyboard.IsKeyDown(Keys.Down))
         {
             newDirection = Vector2.UnitY;
         }
-        else if (keyboardState.IsKeyDown(Keys.A) || keyboardState.IsKeyDown(Keys.Left))
+        else if (Input.Keyboard.IsKeyDown(Keys.A) || Input.Keyboard.IsKeyDown(Keys.Left))
         {
             newDirection = -Vector2.UnitX;
         }
-        else if (keyboardState.IsKeyDown(Keys.D) || keyboardState.IsKeyDown(Keys.Right))
+        else if (Input.Keyboard.IsKeyDown(Keys.D) || Input.Keyboard.IsKeyDown(Keys.Right))
         {
             newDirection = Vector2.UnitX;
         }
@@ -97,37 +96,37 @@ public class Game1 : Core
 
     private void CheckGamePadInput()
     {
-        GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
+        GamePadInfo gamePadOne = Input.GamePads[(int)PlayerIndex.One];
         float speed = MOVE_SPEED;
-        if (gamePadState.IsButtonDown(Buttons.A))
+        if (gamePadOne.IsButtonDown(Buttons.A))
         {
             speed *= 1.5f;
-            GamePad.SetVibration(PlayerIndex.One, 0.5f, 0.5f);
+            gamePadOne.SetVibration(0.5f, TimeSpan.FromSeconds(0.5));
         }
         else
         {
-            GamePad.SetVibration(PlayerIndex.One, 0f, 0f);
+            gamePadOne.StopVibration();
         }
-        if (gamePadState.ThumbSticks.Left != Vector2.Zero)
+        if (gamePadOne.LeftThumbStick != Vector2.Zero)
         {
-            _slimePosition.X += gamePadState.ThumbSticks.Left.X * speed;
-            _slimePosition.Y -= gamePadState.ThumbSticks.Left.Y * speed;
+            _slimePosition.X += gamePadOne.LeftThumbStick.X * speed;
+            _slimePosition.Y -= gamePadOne.LeftThumbStick.Y * speed;
         }
         else
         {
-            if (gamePadState.IsButtonDown(Buttons.DPadUp))
+            if (gamePadOne.IsButtonDown(Buttons.DPadUp))
             {
                 _slimePosition.Y -= speed;
             }
-            if (gamePadState.IsButtonDown(Buttons.DPadDown))
+            if (gamePadOne.IsButtonDown(Buttons.DPadDown))
             {
                 _slimePosition.Y += speed;
             }
-            if (gamePadState.IsButtonDown(Buttons.DPadLeft))
+            if (gamePadOne.IsButtonDown(Buttons.DPadLeft))
             {
                 _slimePosition.X -= speed;
             }
-            if (gamePadState.IsButtonDown(Buttons.DPadRight))
+            if (gamePadOne.IsButtonDown(Buttons.DPadRight))
             {
                 _slimePosition.X += speed;
             }
