@@ -20,6 +20,9 @@ public class Game1 : Core
     private Queue<Vector2> _inputBuffer;
     private const int MAX_INPUT_BUFFER_SIZE = 2;
 
+    private Vector2 _batPosition;
+    private Vector2 _batVelocity;
+
     public Game1()
         : base("Dungeon Slime", 1280, 720, false)
     {
@@ -27,10 +30,24 @@ public class Game1 : Core
 
     protected override void Initialize()
     {
+        base.Initialize();
         _inputBuffer = new Queue<Vector2>();
         // TODO: Add your initialization logic here
+        _batPosition = new Vector2(_slime.Width + 10, 0);
+        AssignRandomBatVelocity();
+    }
+    private void AssignRandomBatVelocity()
+    {
+        // Generate a random angle.
+        float angle = (float)(Random.Shared.NextDouble() * Math.PI * 2);
 
-        base.Initialize();
+        // Convert angle to a direction vector.
+        float x = (float)Math.Cos(angle);
+        float y = (float)Math.Sin(angle);
+        Vector2 direction = new Vector2(x, y);
+
+        // Multiply the direction vector by the movement speed.
+        _batVelocity = direction * MOVE_SPEED;
     }
 
     protected override void LoadContent()
@@ -54,10 +71,71 @@ public class Game1 : Core
         CheckKeyboardInput();
         CheckGamePadInput();
 
-        if (_inputBuffer.Count > 0)
+        Rectangle screenBounds = new Rectangle(0, 0, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight);
+
+        Circle slimeBounds = new Circle((int)(_slimePosition.X + _slime.Width * 0.5f), (int)(_slimePosition.Y + _slime.Height * 0.5f), (int)(_slime.Width * 0.5f));
+
+        if (slimeBounds.Left < screenBounds.Left)
         {
-            Vector2 direction = _inputBuffer.Dequeue();
-            _slimePosition += direction * _speed;
+            _slimePosition.X = screenBounds.Left;
+        }
+        else if (slimeBounds.Right > screenBounds.Right)
+        {
+            _slimePosition.X = screenBounds.Right - _slime.Width;
+        }
+        if (slimeBounds.Top < screenBounds.Top)
+        {
+            _slimePosition.Y = screenBounds.Top;
+        }
+        else if (slimeBounds.Bottom > screenBounds.Bottom)
+        {
+            _slimePosition.Y = screenBounds.Bottom - _slime.Height;
+        }
+
+        Vector2 newBatPosition = _batPosition + _batVelocity;
+
+        Circle batBounds = new Circle((int)(newBatPosition.X + _bat.Width * 0.5f), (int)(newBatPosition.Y + _bat.Height * 0.5f), (int)(_bat.Width * 0.5f));
+
+        Vector2 normal = Vector2.Zero;
+
+        if (batBounds.Left < screenBounds.Left)
+        {
+            normal.X = Vector2.UnitX.X;
+            newBatPosition.X = screenBounds.Left;
+        }
+        else if (batBounds.Right > screenBounds.Right)
+        {
+            normal.X = -Vector2.UnitX.X;
+            newBatPosition.X = screenBounds.Right - _bat.Width;
+        }
+        if (batBounds.Top < screenBounds.Top)
+        {
+            normal.Y = Vector2.UnitY.Y;
+            newBatPosition.Y = screenBounds.Top;
+        }
+        else if (batBounds.Bottom > screenBounds.Bottom)
+        {
+            normal.Y = -Vector2.UnitY.Y;
+            newBatPosition.Y = screenBounds.Bottom - _bat.Height;
+        }
+
+        if (normal != Vector2.Zero)
+        {
+            normal.Normalize();
+            _batVelocity = Vector2.Reflect(_batVelocity, normal);
+        }
+
+        _batPosition = newBatPosition;
+
+        if (slimeBounds.Intersects(batBounds))
+        {
+            int totalColumns = GraphicsDevice.PresentationParameters.BackBufferWidth / (int)_bat.Width;
+            int totalRows = GraphicsDevice.PresentationParameters.BackBufferHeight / (int)_bat.Height;
+
+            int column = Random.Shared.Next(totalColumns);
+            int row = Random.Shared.Next(totalRows);
+            _batPosition = new Vector2(column * _bat.Width, row * _bat.Height);
+            AssignRandomBatVelocity();
         }
     }
 
@@ -91,6 +169,12 @@ public class Game1 : Core
         if (newDirection != Vector2.Zero && _inputBuffer.Count < MAX_INPUT_BUFFER_SIZE)
         {
             _inputBuffer.Enqueue(newDirection);
+        }
+
+        if (_inputBuffer.Count > 0)
+        {
+            Vector2 direction = _inputBuffer.Dequeue();
+            _slimePosition += direction * _speed;
         }
     }
 
@@ -138,7 +222,7 @@ public class Game1 : Core
         GraphicsDevice.Clear(Color.CornflowerBlue);
         SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
         _slime.Draw(SpriteBatch, _slimePosition);
-        _bat.Draw(SpriteBatch, new Vector2(_slime.Width + 10, 0));
+        _bat.Draw(SpriteBatch, _batPosition);
 
         SpriteBatch.End();
         // TODO: Add your drawing code here
