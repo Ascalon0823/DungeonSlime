@@ -2,5 +2,9 @@
     "files.exclude": {
         "**/bin": true,
         "**/obj": true
-    }
+    },
+    "cSpell.words": [
+        "Tilemap",
+        "Tileset"
+    ]
 }
