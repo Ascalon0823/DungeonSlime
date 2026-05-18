@@ -30,6 +30,8 @@ public class Game1 : Core
 
     private SoundEffect _bounceSoundEffect;
     private SoundEffect _collectSoundEffect;
+
+    private Song _themeSong;
     public Game1()
         : base("Dungeon Slime", 1280, 720, false)
     {
@@ -58,6 +60,8 @@ public class Game1 : Core
         // Initial bat position will be in the top left corner of the room
         _batPosition = new Vector2(_roomBounds.Left, _roomBounds.Top);
         AssignRandomBatVelocity();
+
+        Audio.PlaySong(_themeSong);
     }
     private void AssignRandomBatVelocity()
     {
@@ -87,14 +91,7 @@ public class Game1 : Core
         _bounceSoundEffect = Content.Load<SoundEffect>("audio/bounce");
         _collectSoundEffect = Content.Load<SoundEffect>("audio/collect");
 
-        Song theme = Content.Load<Song>("audio/theme");
-
-        if (MediaPlayer.State == MediaState.Playing)
-        {
-            MediaPlayer.Stop();
-        }
-        MediaPlayer.Play(theme);
-        MediaPlayer.IsRepeating = true;
+        _themeSong = Content.Load<Song>("audio/theme");
 
         base.LoadContent();
     }
@@ -161,7 +158,7 @@ public class Game1 : Core
         {
             normal.Normalize();
             _batVelocity = Vector2.Reflect(_batVelocity, normal);
-            _bounceSoundEffect.Play();
+            Audio.PlaySoundEffect(_bounceSoundEffect);
         }
 
         _batPosition = newBatPosition;
@@ -172,7 +169,7 @@ public class Game1 : Core
             int row = Random.Shared.Next(1, _tilemap.Rows - 1);
             _batPosition = new Vector2(column * _bat.Width, row * _bat.Height);
             AssignRandomBatVelocity();
-            _collectSoundEffect.Play();
+            Audio.PlaySoundEffect(_collectSoundEffect);
         }
     }
 
@@ -212,6 +209,23 @@ public class Game1 : Core
         {
             Vector2 direction = _inputBuffer.Dequeue();
             _slimePosition += direction * _speed;
+        }
+
+        if (Input.Keyboard.WasKeyPressed(Keys.M))
+        {
+            Audio.ToggleMute();
+        }
+
+        if (Input.Keyboard.WasKeyPressed(Keys.OemPlus))
+        {
+            Audio.SongVolume += 0.1f;
+            Audio.SoundEffectVolume += 0.1f;
+        }
+
+        if (Input.Keyboard.WasKeyPressed(Keys.OemMinus))
+        {
+            Audio.SongVolume -= 0.1f;
+            Audio.SoundEffectVolume -= 0.1f;
         }
     }
 
