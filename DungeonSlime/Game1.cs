@@ -32,6 +32,12 @@ public class Game1 : Core
     private SoundEffect _collectSoundEffect;
 
     private Song _themeSong;
+
+    private SpriteFont _font;
+    private int _score;
+    private Vector2 _scoreTextPosition;
+    private Vector2 _scoreTextOrigin;
+
     public Game1()
         : base("Dungeon Slime", 1280, 720, false)
     {
@@ -62,6 +68,10 @@ public class Game1 : Core
         AssignRandomBatVelocity();
 
         Audio.PlaySong(_themeSong);
+        _scoreTextPosition = new Vector2(_roomBounds.Left, _tilemap.TileHeight * 0.5f);
+
+        float scoreTextYOrigin = _font.MeasureString("Score").Y * 0.5f;
+        _scoreTextOrigin = new Vector2(0, scoreTextYOrigin);
     }
     private void AssignRandomBatVelocity()
     {
@@ -92,6 +102,8 @@ public class Game1 : Core
         _collectSoundEffect = Content.Load<SoundEffect>("audio/collect");
 
         _themeSong = Content.Load<Song>("audio/theme");
+
+        _font = Content.Load<SpriteFont>("fonts/04B_30");
 
         base.LoadContent();
     }
@@ -170,6 +182,7 @@ public class Game1 : Core
             _batPosition = new Vector2(column * _bat.Width, row * _bat.Height);
             AssignRandomBatVelocity();
             Audio.PlaySoundEffect(_collectSoundEffect);
+            _score += 100;
         }
     }
 
@@ -275,6 +288,8 @@ public class Game1 : Core
         _tilemap.Draw(SpriteBatch);
         _slime.Draw(SpriteBatch, _slimePosition);
         _bat.Draw(SpriteBatch, _batPosition);
+
+        SpriteBatch.DrawString(_font, $"Score: {_score}", _scoreTextPosition, Color.White, 0f, _scoreTextOrigin, 1f, SpriteEffects.None, 0f);
 
         SpriteBatch.End();
         // TODO: Add your drawing code here
